@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Davomat</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+:root {
+  --paper: #f2f5fa; --surface: #ffffff; --ink: #0c1b33; --muted: #586a88; --rule: #d3dbe8;
+  --navy: #0b2a5b; --navy2: #16407f; --field: #ffffff;
+  --ok: #1b8a5a; --warn: #a96a00; --bad: #c0392b;
+  --bg: var(--paper); --fg: var(--ink); --hint: var(--muted); --card: var(--surface);
+  --btn: var(--navy); --btnfg: #ffffff;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #0a1322; --surface: #101c33; --ink: #e6edfb; --muted: #8fa2c4; --rule: #22314f;
+    --navy: #2f64c4; --navy2: #4a7fe0; --field: #0a1322; --ok: #38b27d; --warn: #d99a2b; --bad: #e5604f; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--paper); color: var(--ink);
+  font: 16px/1.45 "Segoe UI", Roboto, -apple-system, "Helvetica Neue", Arial, sans-serif; font-variant-numeric: tabular-nums; }
+body { padding: 0 0 calc(74px + env(safe-area-inset-bottom, 0px)); }
+section, #loading { padding: 0 16px; }
+.top { display: flex; align-items: center; gap: 12px; background: var(--navy); color: #fff; margin-bottom: 18px;
+  padding: calc(14px + env(safe-area-inset-top, 0px)) 16px 14px; border-bottom: 3px solid var(--navy2); }
+.seal { width: 38px; height: 38px; border: 2px solid rgba(255,255,255,.6); border-radius: 8px; display: grid; place-items: center; font-weight: 700; font-size: 19px; }
+.top b { display: block; font-size: 18px; letter-spacing: .2px; line-height: 1.2; }
+.top small { display: block; font-size: 13px; opacity: .78; }
+h1 { font-size: 21px; font-weight: 650; letter-spacing: -.2px; margin: 0 0 14px; }
+h2 { font-size: 16px; font-weight: 650; margin: 22px 0 10px; padding-top: 14px; border-top: 1px solid var(--rule); }
+.card { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 14px 16px; margin-bottom: 14px; }
+.muted { color: var(--muted); font-size: 14px; }
+.big { font-size: 28px; font-weight: 700; letter-spacing: -.3px; line-height: 1.2; }
+.ok { color: var(--ok); } .bad { color: var(--bad); } .warn { color: var(--warn); }
+button, select, input { font: inherit; }
+.punch { width: 100%; height: 84px; border: 0; border-radius: 14px; background: var(--navy); color: #fff; font-size: 21px; font-weight: 700;
+  letter-spacing: .2px; margin: 4px 0 10px; box-shadow: 0 8px 20px rgba(11,42,91,.28); transition: transform .08s; }
+.punch:active { transform: scale(.985); }
+.punch:disabled { opacity: .5; box-shadow: none; }
+.btn { border: 0; border-radius: 10px; padding: 13px 14px; background: var(--navy); color: #fff; font-weight: 600; width: 100%; margin-top: 10px; }
+.btn.alt { background: transparent; color: var(--ink); border: 1px solid var(--rule); }
+.btn:disabled { opacity: .5; }
+button:focus-visible, .btn:focus-visible, input:focus-visible, select:focus-visible, label.btn:focus-within { outline: 2px solid var(--navy2); outline-offset: 2px; }
+.msg { min-height: 22px; font-weight: 600; margin: 4px 0 8px; white-space: pre-line; }
+.row { display: flex; justify-content: space-between; gap: 10px; padding: 11px 0; border-bottom: 1px solid var(--rule); }
+.row:last-child { border-bottom: 0; }
+.person:active { background: var(--paper); }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+.stat { background: var(--surface); border: 1px solid var(--rule); border-left: 4px solid var(--navy); border-radius: 8px; padding: 10px 12px; }
+.stat:nth-child(1) { border-left-color: var(--ok); } .stat:nth-child(2) { border-left-color: var(--warn); } .stat:nth-child(3) { border-left-color: var(--bad); }
+.stat b { display: block; font-size: 28px; line-height: 1.15; }
+details { border-top: 1px solid var(--rule); padding: 12px 0; }
+details:last-of-type { border-bottom: 1px solid var(--rule); }
+summary { font-weight: 600; }
+ul { margin: 8px 0 2px; padding-left: 18px; } li { margin: 4px 0; }
+input[type=text], input[type=search], input[type=date], input[type=time], select {
+  width: 100%; padding: 11px 12px; border-radius: 8px; border: 1px solid var(--rule); background: var(--field); color: var(--ink); margin: 4px 0; }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+label { font-size: 13px; color: var(--muted); display: block; margin-top: 8px; }
+.person { cursor: pointer; }
+.tag { font-size: 12px; background: var(--navy); color: #fff; border-radius: 4px; padding: 1px 6px; margin-left: 6px; }
+nav { position: fixed; left: 0; right: 0; bottom: 0; display: flex; background: var(--surface); border-top: 1px solid var(--rule); padding-bottom: env(safe-area-inset-bottom, 0px); }
+nav button { flex: 1; border: 0; border-top: 3px solid transparent; background: none; color: var(--muted); padding: 14px 6px 12px; font-weight: 600; }
+nav button.on { color: var(--navy); border-top-color: var(--navy); }
+@media (prefers-color-scheme: dark) { nav button.on { color: #fff; } }
+.back { position: fixed; inset: 0; background: rgba(5,12,28,.55); z-index: 5; }
+.sheet { position: fixed; left: 0; right: 0; bottom: 0; max-height: 88vh; overflow: auto; z-index: 6; background: var(--paper);
+  border-radius: 18px 18px 0 0; padding: 22px 16px calc(20px + env(safe-area-inset-bottom, 0px)); }
+.sheet::before { content: ""; position: absolute; top: 8px; left: 50%; width: 40px; height: 4px; margin-left: -20px; border-radius: 2px; background: var(--rule); }
+#toast { position: fixed; left: 14px; right: 14px; top: 12px; z-index: 9; padding: 12px 14px; border-radius: 10px; color: #fff;
+  font-weight: 600; white-space: pre-line; display: none; box-shadow: 0 6px 18px rgba(0,0,0,.25); }
+.cam { position: fixed; inset: 0; z-index: 20; background: #000; display: flex; flex-direction: column; }
+.cam video { flex: 1; min-height: 0; width: 100%; object-fit: cover; transform: scaleX(-1); background: #111; }
+.camHint { color: #fff; text-align: center; padding: 10px 14px; font-size: 15px; }
+.camBar { padding: 4px 14px calc(14px + env(safe-area-inset-bottom, 0px)); background: #000; }
+.camBar .btn.alt { color: #fff; border-color: rgba(255,255,255,.35); }
+.vh { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; }
+label.btn { display: block; text-align: center; cursor: pointer; font-size: 16px; color: var(--ink); margin-top: 10px; }
+[hidden] { display: none !important; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<header class="top"><span class="seal">D</span><div><b>Davomat</b><small>Xodimlar ish vaqti hisobi</small></div></header>
+<div id="loading" class="muted">Yuklanmoqda…</div>
+
+<section id="tab-me" hidden>
+  <h1 id="meName"></h1>
+  <div class="card">
+    <div class="muted">Bugun</div>
+    <div id="meState" class="big"></div>
+    <div id="meDetail" class="muted"></div>
+  </div>
+  <button id="punchBtn" class="punch">📍 KELDIM / KETDIM</button>
+  <div id="punchMsg" class="msg"></div>
+  <div id="selfieHint" class="muted" hidden></div>
+  <h2>Oxirgi kunlar</h2>
+  <div id="history" class="card"></div>
+</section>
+
+<section id="tab-rep" hidden>
+  <h1>Hisobot <span id="repDate" class="muted"></span></h1>
+  <div id="repBody"></div>
+  <button id="repRefresh" class="btn alt">🔄 Yangilash</button>
+</section>
+
+<section id="tab-kadr" hidden>
+  <h1>Kadr paneli</h1>
+  <input type="search" id="q" placeholder="Ism bo'yicha qidirish">
+  <select id="kodFilter"></select>
+  <div id="staffList" class="card" style="margin-top:10px"></div>
+</section>
+
+<div id="cam" class="cam" hidden>
+  <div id="camHint" class="camHint"></div>
+  <video id="camVideo" playsinline autoplay muted></video>
+  <div class="camBar">
+    <button id="camShot" class="btn">📸 Rasmga olish</button>
+    <label for="camFile" class="btn alt">Kamera ochilmasa: telefon kamerasi bilan olish</label>
+    <input type="file" id="camFile" class="vh" accept="image/*" capture="user">
+    <button id="camCancel" class="btn alt">Bekor qilish</button>
+  </div>
+</div>
+
+<nav id="nav" hidden></nav>
+<div id="back" class="back" hidden></div>
+<div id="sheet" class="sheet" hidden></div>
+<div id="toast"></div>
+
+<script>
+(function () {
+"use strict";
+
+// >>> Apps Script "Web app" havolasini shu yerga qo'ying (/exec bilan tugaydi) <<<
+const API_URL = "BU_YERGA_APPS_SCRIPT_WEB_APP_URL";
+
+const tg = window.Telegram && window.Telegram.WebApp;
+if (tg) { tg.ready(); tg.expand(); try { tg.setHeaderColor("#0b2a5b"); } catch (e) {} }
+
+const $ = function (id) { return document.getElementById(id); };
+function esc(s) {
+  return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+    return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+  });
+}
+function todayStr() {
+  try { return new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Tashkent" }); }
+  catch (e) { return new Date().toISOString().slice(0, 10); }
+}
+function haptic(ok) {
+  try { tg.HapticFeedback.notificationOccurred(ok ? "success" : "error"); } catch (e) {}
+}
+
+let ME = null, STAFF = null, CURRENT = "";
+let toastTimer = null;
+function toast(text, ok) {
+  const t = $("toast");
+  t.textContent = text;
+  t.style.background = ok ? "var(--ok)" : "var(--bad)";
+  t.style.display = "block";
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function () { t.style.display = "none"; }, 4500);
+  haptic(ok);
+}
+
+async function api(action, data) {
+  const res = await fetch(API_URL, {
+    method: "POST",
+    headers: { "Content-Type": "text/plain;charset=utf-8" },   // preflight talab qilinmasligi uchun
+    body: JSON.stringify(Object.assign({ initData: tg ? tg.initData : "", action: action }, data || {}))
+  });
+  if (!res.ok) throw new Error("Server javob bermadi");
+  return res.json();
+}
+
+function fatal(text) {
+  $("loading").hidden = false;
+  $("loading").innerHTML = '<div class="card">' + esc(text) + "</div>";
+}
+
+// ---------------- Boshlash ----------------
+async function boot() {
+  if (!tg || !tg.initData) return fatal("Bu sahifa Telegram ichida, bot orqali ochiladi.");
+  if (API_URL.indexOf("BU_YERGA") === 0) return fatal("API_URL kiritilmagan (index.html boshida).");
+  try { ME = await api("me"); }
+  catch (e) { return fatal("Serverga ulanib bo'lmadi. Internetni tekshirib, qayta oching."); }
+  if (ME.err === "auth") return fatal("Kirish tasdiqlanmadi. Ilovani bot ichidan qayta oching.");
+
+  const tabs = [];
+  if (ME.isStaff) tabs.push(["me", "Men"]);
+  if (ME.isAdmin) tabs.push(["rep", "Hisobot"]);
+  if (ME.isKadr) tabs.push(["kadr", "Kadr"]);
+  if (!tabs.length) return fatal("Siz ro'yxatdan o'tmagansiz. Botga o'tib /start bosing va raqamingizni yuboring.");
+
+  $("loading").hidden = true;
+  const nav = $("nav");
+  nav.innerHTML = "";
+  tabs.forEach(function (t) {
+    const b = document.createElement("button");
+    b.textContent = t[1];
+    b.dataset.tab = t[0];
+    b.addEventListener("click", function () { go(t[0]); });
+    nav.appendChild(b);
+  });
+  nav.hidden = tabs.length < 2;
+  go(tabs[0][0]);
+}
+
+function go(name) {
+  CURRENT = name;
+  ["me", "rep", "kadr"].forEach(function (n) { $("tab-" + n).hidden = n !== name; });
+  Array.prototype.forEach.call($("nav").children, function (b) { b.classList.toggle("on", b.dataset.tab === name); });
+  if (name === "me") renderMe();
+  if (name === "rep") loadRep();
+  if (name === "kadr") loadKadr();
+}
+
+// ---------------- Xodim: "Men" ----------------
+function getLoc() {
+  return new Promise(function (resolve, reject) {
+    function fallback() {
+      if (!navigator.geolocation) return reject(new Error("Bu qurilmada joylashuv aniqlanmaydi."));
+      navigator.geolocation.getCurrentPosition(
+        function (p) { resolve({ lat: p.coords.latitude, lng: p.coords.longitude }); },
+        function () { reject(new Error("Joylashuvga ruxsat bering (Telegram sozlamalarida).")); },
+        { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+      );
+    }
+    const lm = tg && tg.LocationManager;
+    if (lm && lm.init) {
+      lm.init(function () {
+        if (!lm.isLocationAvailable) return fallback();
+        lm.getLocation(function (loc) {
+          if (loc) resolve({ lat: loc.latitude, lng: loc.longitude });
+          else fallback();
+        });
+      });
+    } else fallback();
+  });
+}
+
+function frameToB64(src, w, h) {
+  const sc = Math.min(1, 480 / Math.max(w, h));
+  const c = document.createElement("canvas");
+  c.width = Math.max(1, Math.round(w * sc));
+  c.height = Math.max(1, Math.round(h * sc));
+  c.getContext("2d").drawImage(src, 0, 0, c.width, c.height);
+  return c.toDataURL("image/jpeg", 0.6).split(",")[1];
+}
+
+function takeSelfie() {
+  return new Promise(function (resolve, reject) {
+    const cam = $("cam"), vid = $("camVideo"), hint = $("camHint"), file = $("camFile");
+    let stream = null, closed = false;
+    function close() {
+      closed = true;
+      if (stream) stream.getTracks().forEach(function (t) { t.stop(); });
+      vid.srcObject = null;
+      cam.hidden = true;
+      $("camShot").onclick = null; $("camCancel").onclick = null; file.onchange = null;
+    }
+    $("camCancel").onclick = function () { close(); reject(new Error("Bekor qilindi.")); };
+    $("camShot").onclick = function () {
+      if (!stream || !vid.videoWidth) return;
+      const b64 = frameToB64(vid, vid.videoWidth, vid.videoHeight);
+      close(); resolve({ photo: b64, psrc: "camera" });
+    };
+    file.value = "";
+    file.onchange = function () {
+      const f = file.files && file.files[0];
+      if (!f) return;
+      const img = new Image(), url = URL.createObjectURL(f);
+      img.onload = function () {
+        const b64 = frameToB64(img, img.naturalWidth, img.naturalHeight);
+        URL.revokeObjectURL(url);
+        close(); resolve({ photo: b64, psrc: "file" });
+      };
+      img.onerror = function () { URL.revokeObjectURL(url); hint.textContent = "Rasmni o'qib bo'lmadi. Qayta urinib ko'ring."; };
+      img.src = url;
+    };
+    hint.textContent = "Yuzingiz ko'rinib tursin";
+    cam.hidden = false;
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      navigator.mediaDevices.getUserMedia({ video: { facingMode: "user", width: { ideal: 640 }, height: { ideal: 480 } }, audio: false })
+        .then(function (s) {
+          if (closed) { s.getTracks().forEach(function (t) { t.stop(); }); return; }
+          stream = s; vid.srcObject = s;
+          if (vid.play) { try { vid.play(); } catch (e) {} }
+        })
+        .catch(function () { hint.textContent = "Kamera ochilmadi. Pastdagi tugma orqali telefon kamerasi bilan rasmga oling."; });
+    } else {
+      hint.textContent = "Kamera ochilmadi. Pastdagi tugma orqali telefon kamerasi bilan rasmga oling.";
+    }
+  });
+}
+
+function renderMe() {
+  $("meName").textContent = ME.name;
+  const t = ME.today;
+  let state = "Hali belgilanmagan", cls = "muted", detail = "";
+  if (t) {
+    if (!t.in) { state = t.holat; cls = "warn"; }
+    else if (t.out) { state = "Ketdi " + t.out; cls = "ok"; detail = "Keldi " + t.in + " · " + t.holat; }
+    else { state = "Keldi " + t.in; cls = "ok"; detail = t.holat; }
+  }
+  const s = $("meState");
+  s.textContent = state;
+  s.className = "big " + cls;
+  $("meDetail").textContent = detail;
+
+  const b = $("punchBtn");
+  const away = t && !t.in;
+  b.disabled = !ME.punchEnabled || !!away;
+  b.hidden = false;
+  if (!ME.punchEnabled) $("punchMsg").textContent = "Belgilash uchun botdagi 📍 tugmadan foydalaning.";
+  const sh = $("selfieHint");
+  sh.hidden = !ME.selfie;
+  if (ME.selfie) sh.textContent = "📸 Belgilashda selfie olinadi va " + ME.keepDays + " kun saqlanadi, keyin o'chiriladi.";
+
+  const h = $("history");
+  if (!ME.history || !ME.history.length) h.innerHTML = '<div class="muted">Hozircha yozuv yo\'q.</div>';
+  else h.innerHTML = ME.history.map(function (x) {
+    const mid = x.in ? esc(x.in) + (x.out ? " – " + esc(x.out) : " – …") : "";
+    return '<div class="row"><span>' + esc(x.date.slice(8) + "." + x.date.slice(5, 7)) + "</span><span>" + mid +
+           '</span><span class="muted">' + esc(x.holat) + "</span></div>";
+  }).join("");
+}
+
+async function punch() {
+  const b = $("punchBtn"), msg = $("punchMsg");
+  b.disabled = true;
+  msg.className = "msg"; msg.textContent = "";
+  const old = b.textContent;
+  try {
+    let extra = {};
+    if (ME.selfie) {
+      b.textContent = "Kamera ochilmoqda…";
+      const shot = await takeSelfie();
+      extra = { photo: shot.photo, psrc: shot.psrc };
+    }
+    b.textContent = "Joylashuv aniqlanmoqda…";
+    const loc = await getLoc();
+    b.textContent = "Yuborilmoqda…";
+    const r = await api("punch", Object.assign({ lat: loc.lat, lng: loc.lng }, extra));
+    msg.textContent = r.msg || r.err || "Xatolik";
+    msg.className = "msg " + (r.ok ? "ok" : "bad");
+    haptic(!!r.ok);
+    if (r.today !== undefined) ME.today = r.today;
+    if (r.history) ME.history = r.history;
+  } catch (e) {
+    msg.textContent = e.message || "Xatolik";
+    msg.className = "msg bad";
+    haptic(false);
+  }
+  b.textContent = old;
+  renderMe();
+}
+
+// ---------------- Rahbar / kadr: "Hisobot" ----------------
+function sec(title, items, open) {
+  if (!items.length) return "";
+  return "<details" + (open ? " open" : "") + "><summary>" + esc(title) + " (" + items.length + ")</summary><ul>" +
+    items.map(function (x) { return "<li>" + esc(x) + "</li>"; }).join("") + "</ul></details>";
+}
+async function loadRep() {
+  $("repBody").innerHTML = '<div class="muted">Yuklanmoqda…</div>';
+  try {
+    const r = await api("report");
+    if (!r.ok) throw new Error("Ruxsat yo'q");
+    const d = r.data;
+    $("repDate").textContent = d.date;
+    $("repBody").innerHTML =
+      '<div class="grid">' +
+      '<div class="stat"><span class="muted">Kelgan</span><b class="ok">' + d.came.length + "</b></div>" +
+      '<div class="stat"><span class="muted">Kechikkan</span><b class="warn">' + d.late.length + "</b></div>" +
+      '<div class="stat"><span class="muted">Kelmagan</span><b class="bad">' + d.absent.length + "</b></div>" +
+      '<div class="stat"><span class="muted">Ta\'til/kasal/safar</span><b>' + d.away.length + "</b></div></div>" +
+      sec("⏰ Kechikkanlar", d.late.map(function (x) { return x.name + " — " + x.at; }), true) +
+      sec("❌ Kelmaganlar", d.absent, true) +
+      sec("🏖 Ta'til/kasal/safarda", d.away.map(function (x) { return x.name + " — " + x.holat; }), false) +
+      sec("🚪 Erta ketganlar", d.early.map(function (x) { return x.name + " — " + x.at; }), false) +
+      sec("👀 Tekshiruvga javob bermaganlar", d.miss.map(function (x) { return x.name + " — " + x.at; }), false) +
+      sec("📋 Botda yo'q (qog'ozda tekshiring)", d.noBot, false) +
+      '<div class="muted" style="margin:6px 0 12px">Ketishni belgilamagan: ' + d.still + " · Rad etilgan urinishlar: " + d.bad + "</div>";
+  } catch (e) {
+    $("repBody").innerHTML = '<div class="card bad">' + esc(e.message || "Xatolik") + "</div>";
+  }
+}
+
+// ---------------- Kadr paneli ----------------
+async function loadKadr() {
+  if (!STAFF) $("staffList").innerHTML = '<div class="muted">Yuklanmoqda…</div>';
+  try {
+    const r = await api("staff");
+    if (!r.ok) throw new Error("Ruxsat yo'q");
+    STAFF = r;
+    const sel = $("kodFilter"), cur = sel.value;
+    sel.innerHTML = '<option value="">Hamma toifalar</option>' +
+      r.cats.map(function (c) { return '<option value="' + esc(c.kod) + '">' + esc(c.kod + " — " + c.name) + "</option>"; }).join("");
+    sel.value = cur;
+    renderStaff();
+  } catch (e) {
+    $("staffList").innerHTML = '<div class="bad">' + esc(e.message || "Xatolik") + "</div>";
+  }
+}
+function renderStaff() {
+  if (!STAFF) return;
+  const q = $("q").value.trim().toLowerCase(), kf = $("kodFilter").value;
+  const rows = [];
+  STAFF.staff.forEach(function (p, i) {
+    if (q && p.name.toLowerCase().indexOf(q) < 0) return;
+    if (kf && p.kod !== kf) return;
+    const cls = p.state.indexOf("keldi") === 0 ? "ok" : p.state === "kelmagan" ? "bad" : "warn";
+    rows.push('<div class="row person" data-i="' + i + '"><span>' + esc(p.name) +
+      (p.kod ? '<span class="tag">' + esc(p.kod) + "</span>" : "") +
+      (p.reg ? "" : ' <span class="muted">(botda yo\'q)</span>') +
+      '</span><span class="' + cls + '">' + esc(p.state) + "</span></div>");
+  });
+  $("staffList").innerHTML = rows.length ? rows.join("") : '<div class="muted">Hech kim topilmadi.</div>';
+}
+
+function closeSheet() { $("sheet").hidden = true; $("back").hidden = true; }
+
+function openSheet(p) {
+  const kodOpts = '<option value="">— yo\'q —</option>' + STAFF.cats.map(function (c) {
+    return '<option value="' + esc(c.kod) + '"' + (c.kod === p.kod ? " selected" : "") + ">" + esc(c.kod + " — " + c.name) + "</option>";
+  }).join("");
+  $("sheet").innerHTML =
+    "<h1>" + esc(p.name) + '</h1><div class="muted">Bugun: ' + esc(p.state) + " · umumiy qoida bo'yicha kelish " + esc(p.late) + ", ketish " + esc(p.leave) + "</div>" +
+
+    "<h2>Vaqtni tuzatish</h2>" +
+    '<label>Sana</label><input type="date" id="fDate" value="' + todayStr() + '">' +
+    '<div class="two"><div><label>Keldi</label><input type="time" id="fIn"></div><div><label>Ketdi</label><input type="time" id="fOut"></div></div>' +
+    '<button class="btn" id="btnTuzat">Tuzatish</button>' +
+
+    "<h2>Ta'til / kasal / safar</h2>" +
+    '<select id="bCode"><option value="T">Ta\'til</option><option value="K">Kasal (varaqa)</option>' +
+    '<option value="X">Xizmat safari</option><option value="M">Malaka oshirish</option><option value="0">Belgini o\'chirish</option></select>' +
+    '<div class="two"><div><label>Dan</label><input type="date" id="bFrom" value="' + todayStr() + '"></div>' +
+    '<div><label>Gacha (ixtiyoriy)</label><input type="date" id="bTo"></div></div>' +
+    '<button class="btn" id="btnBelgi">Belgilash</button>' +
+
+    "<h2>Shaxsiy vaqt va toifa</h2>" +
+    '<div class="two"><div><label>Kelish chegarasi</label><input type="time" id="vLate" value="' + esc(p.ownLate) + '"></div>' +
+    '<div><label>Ketish vaqti</label><input type="time" id="vLeave" value="' + esc(p.ownLeave) + '"></div></div>' +
+    '<label>Toifa kodi</label><select id="vKod">' + kodOpts + "</select>" +
+    '<div class="muted" style="margin-top:6px">Bo\'sh vaqt = toifa yoki umumiy qoida ishlaydi.</div>' +
+    '<button class="btn" id="btnVaqt">Saqlash</button>' +
+    '<button class="btn alt" id="btnClose">Yopish</button>';
+
+  async function run(btn, fn) {
+    btn.disabled = true;
+    try {
+      const r = await fn();
+      toast(r.msg || r.err || "Xatolik", !!r.ok);
+      if (r.ok) { closeSheet(); await loadKadr(); }
+    } catch (e) { toast(e.message || "Xatolik", false); }
+    btn.disabled = false;
+  }
+  $("btnTuzat").onclick = function () {
+    run(this, function () { return api("tuzat", { name: p.name, date: $("fDate").value, in: $("fIn").value || "-", out: $("fOut").value || "-" }); });
+  };
+  $("btnBelgi").onclick = function () {
+    const a = $("bFrom").value, b = $("bTo").value;
+    if (!a) return toast("Sanani tanlang.", false);
+    run(this, function () { return api("belgi", { name: p.name, date: b ? a + ".." + b : a, code: $("bCode").value }); });
+  };
+  $("btnVaqt").onclick = function () {
+    run(this, async function () {
+      const r1 = await api("vaqt", { name: p.name, late: $("vLate").value, leave: $("vLeave").value });
+      if (!r1.ok) return r1;
+      return api("kod", { name: p.name, kod: $("vKod").value || "-" });
+    });
+  };
+  $("btnClose").onclick = closeSheet;
+  $("back").hidden = false;
+  $("sheet").hidden = false;
+}
+
+// ---------------- Hodisalar ----------------
+$("punchBtn").addEventListener("click", punch);
+$("repRefresh").addEventListener("click", loadRep);
+$("q").addEventListener("input", renderStaff);
+$("kodFilter").addEventListener("change", renderStaff);
+$("back").addEventListener("click", closeSheet);
+$("staffList").addEventListener("click", function (e) {
+  let el = e.target;
+  while (el && !(el.dataset && el.dataset.i !== undefined)) el = el.parentNode;
+  if (el && STAFF) openSheet(STAFF.staff[Number(el.dataset.i)]);
+});
+
+boot();
+})();
+</script>
+</body>
+</html>
