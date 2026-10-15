@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="uz"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>TINGLA Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@700&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#100B20;--bg2:#19112E;--card:#21183A;--pur:#6D3BE8;--glow:#A78BFA;--txt:#F4F1FA;--mut:#AAA1C1;--bd:#35294F;--acc:#D8C7FF;color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*,*::before,*::after{box-sizing:inherit;margin:0}
+html,body{height:100%;background:var(--bg);color:var(--txt);font:15px Manrope,system-ui,sans-serif}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--glow);outline-offset:2px}
+.logo{display:flex;align-items:center;font:700 26px/1 "Cormorant Garamond",Georgia,serif;letter-spacing:.14em;background:linear-gradient(180deg,#fff,#c9b6ff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.lg{height:28px;margin:0 .14em 0 0;filter:drop-shadow(0 0 6px #a78bfa)}
+.wrap{display:flex;height:100%}
+.side{width:230px;flex:none;background:var(--bg2);border-right:1px solid var(--bd);padding:20px 12px;display:flex;flex-direction:column;gap:6px}
+.side .logo{padding:0 10px 18px}
+.side button{text-align:left;padding:12px 14px;border-radius:12px;color:var(--mut);font-weight:600}
+.side button.on{background:var(--card);color:var(--acc)}
+.side .sp{flex:1}
+main{flex:1;min-width:0;overflow:auto;padding:26px 28px 60px}
+h1{font:700 30px/1.2 "Cormorant Garamond",Georgia,serif;margin-bottom:4px}
+.sub{color:var(--mut);font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin:20px 0}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:18px;padding:16px 18px}
+.card b{display:block;font:700 34px/1.1 "Cormorant Garamond",serif;color:var(--acc);margin-top:6px}
+.bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:18px 0 12px}
+.btn{background:linear-gradient(135deg,var(--pur),#8b5cf6);border-radius:12px;padding:10px 18px;font-weight:700;min-height:44px;box-shadow:0 6px 20px #6d3be844}
+.btn.g{background:var(--card);border:1px solid var(--bd);box-shadow:none}
+.btn.s{padding:6px 12px;min-height:34px;font-size:13px;border-radius:10px}
+input,select,textarea{width:100%;background:var(--bg2);border:1px solid var(--bd);border-radius:12px;color:var(--txt);font:inherit;padding:11px 12px;min-height:44px}
+.bar input{max-width:280px}.bar select{max-width:170px}
+.tw{overflow-x:auto;border:1px solid var(--bd);border-radius:18px;background:var(--card)}
+table{width:100%;border-collapse:collapse;min-width:640px}
+th,td{padding:12px 14px;text-align:left;border-bottom:1px solid var(--bd);font-size:14px;white-space:nowrap}
+th{color:var(--mut);font-weight:600;font-size:13px}
+tr:last-child td{border-bottom:0}
+.bd{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:600;background:#35294f;color:var(--acc)}
+.bd.p{background:#6d3be833;color:#c9b6ff}.bd.ok{background:#1f4d3a;color:#8be9b6}.bd.dr{background:#4d3b1f;color:#f1c98a}
+.mo{position:fixed;inset:0;background:#0009;display:grid;place-items:center;padding:16px;z-index:30;overflow:auto}
+.md{background:var(--bg2);border:1px solid var(--bd);border-radius:22px;padding:22px;width:100%;max-width:520px}
+.md h2{font:700 24px "Cormorant Garamond",serif;margin-bottom:12px}
+.f{margin-bottom:12px}.f label{display:block;font-size:13px;color:var(--mut);margin-bottom:5px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ft{display:flex;gap:10px;justify-content:flex-end;margin-top:16px}
+.note{color:var(--mut);font-size:12px;margin-top:18px;line-height:1.5}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--card);border:1px solid var(--glow);padding:10px 16px;border-radius:14px;z-index:50;font-size:13px}
+.login{height:100%;display:grid;place-items:center;padding:20px;background:radial-gradient(100% 60% at 50% 0,#2a1a55,var(--bg) 70%)}
+.login .md{text-align:center}.login .logo{justify-content:center;font-size:36px;margin-bottom:14px}.login .lg{height:38px}
+@media(max-width:760px){.wrap{flex-direction:column}.side{width:auto;flex-direction:row;overflow-x:auto;border-right:0;border-bottom:1px solid var(--bd);padding:10px;align-items:center}.side .logo{padding:0 8px}.side .sp{display:none}main{padding:18px 14px 60px}.two{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style></head><body><div id="app"></div>
+<script>
+const LOGO=`<div class="logo" aria-label="TINGLA">T<svg class="lg" viewBox="0 0 16 36" aria-hidden="true"><defs><linearGradient id="lgI" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F4F1FA"/><stop offset="1" stop-color="#A78BFA"/></linearGradient></defs><rect x="6" y="14" width="4" height="22" rx="2" fill="url(#lgI)"/><circle cx="8" cy="8" r="7.5" fill="none" stroke="#A78BFA" stroke-width=".5" opacity=".6"/><path d="M8 0l1.8 6.2L16 8l-6.2 1.8L8 16l-1.8-6.2L0 8l6.2-1.8z" fill="#D8C7FF"/></svg>NGLA</div>`;
+const CATS=["Ertaklar","Multfilmlar","Rivojlantiruvchi","Uyqu oldidan","Sarguzasht","Hikoyalar"];
+const AGES=["2–4","5–7","8+"];
+const SEED=[["Oltin baliq","a","Ertaklar","5–7",1260,0,1,980],["Tungi bog'ning sirlari","a","Uyqu oldidan","2–4",1500,0,1,760],["Kichik yulduz","a","Uyqu oldidan","2–4",840,1,1,640],["Sehrli kitob","a","Sarguzasht","8+",1920,1,1,520],["Alifbo sayohati","v","Rivojlantiruvchi","2–4",600,0,1,1210],["Do'stlik ertagi","v","Multfilmlar","5–7",540,0,1,1430],["Sehrli qo'ziqorinlar","v","Multfilmlar","5–7",900,1,0,0],["Kichik kashfiyotchilar","v","Rivojlantiruvchi","5–7",720,1,1,330]];
+const D=864e5;
+const seed=()=>({s:SEED.map((r,i)=>({id:i+1,t:r[0],ty:r[1],c:r[2],age:r[3],d:r[4],pr:r[5],pub:r[6],v:r[7],x:"",fn:""})),u:[["Aziza K.",100000001,Date.now()+12*D],["Jasur M.",100000002,0],["Madina R.",100000003,Date.now()+25*D],["Bekzod T.",100000004,0],["Dilnoza S.",100000005,Date.now()-3*D]].map(r=>({n:r[0],id:r[1],pu:r[2]})),nid:9});
+const ld=()=>{try{return JSON.parse(localStorage.getItem("tg_admin"))||seed()}catch(e){return seed()}};
+const sv=()=>{try{localStorage.setItem("tg_admin",JSON.stringify(db))}catch(e){}};
+let db=ld();
+const st={ok:false,pg:"dash",q:"",ty:"",edit:null,del:null};
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const mn=s=>Math.round(s/60)+" daq";
+const dt=t=>{const d=new Date(t);return String(d.getDate()).padStart(2,"0")+"."+String(d.getMonth()+1).padStart(2,"0")+"."+d.getFullYear()};
+const isP=u=>u.pu>Date.now();
+function toast(m){const e=document.createElement("div");e.className="toast";e.textContent=m;document.body.appendChild(e);setTimeout(()=>e.remove(),1800)}
+
+function dash(){
+ const top=[...db.s].sort((a,b)=>b.v-a.v).slice(0,5);
+ return `<h1>Boshqaruv</h1><p class="sub">Umumiy ko'rinish (namuna ma'lumotlar)</p>
+ <div class="grid"><div class="card"><span class="sub">Hikoyalar</span><b>${db.s.length}</b></div><div class="card"><span class="sub">Audio / Video</span><b>${db.s.filter(x=>x.ty==="a").length} / ${db.s.filter(x=>x.ty==="v").length}</b></div><div class="card"><span class="sub">Foydalanuvchilar</span><b>${db.u.length}</b></div><div class="card"><span class="sub">Premium obunachilar</span><b>${db.u.filter(isP).length}</b></div></div>
+ <h2 style="font:700 22px 'Cormorant Garamond',serif;margin-bottom:10px">Eng ko'p ko'rilganlar</h2>
+ <div class="tw"><table><tr><th>Hikoya</th><th>Turi</th><th>Ko'rishlar</th></tr>${top.map(x=>`<tr><td>${esc(x.t)}</td><td>${x.ty==="a"?"Audio":"Video"}</td><td>${x.v}</td></tr>`).join("")}</table></div>
+ <p class="note">Ko'rishlar soni hozircha namuna. Haqiqiy statistika backend ulanganda hisoblanadi.</p>`;
+}
+function stories(){
+ const r=db.s.filter(x=>x.t.toLowerCase().includes(st.q.toLowerCase())&&(!st.ty||x.ty===st.ty));
+ return `<h1>Hikoyalar</h1><p class="sub">Audio va video kontentni boshqarish</p>
+ <div class="bar"><input id="q" value="${esc(st.q)}" placeholder="Qidirish" aria-label="Qidirish"><select id="ty" aria-label="Turi"><option value="">Barchasi</option><option value="a" ${st.ty==="a"?"selected":""}>Audio</option><option value="v" ${st.ty==="v"?"selected":""}>Video</option></select><button class="btn" data-a="new">+ Hikoya qo'shish</button></div>
+ <div class="tw"><table><tr><th>Sarlavha</th><th>Turi</th><th>Turkum</th><th>Yosh</th><th>Davomiyligi</th><th>Kirish</th><th>Holat</th><th></th></tr>
+ ${r.length?r.map(x=>`<tr><td>${esc(x.t)}</td><td>${x.ty==="a"?"Audio":"Video"}</td><td>${esc(x.c)}</td><td>${esc(x.age)}</td><td>${mn(x.d)}</td><td><span class="bd ${x.pr?"p":""}">${x.pr?"Premium":"Bepul"}</span></td><td><span class="bd ${x.pub?"ok":"dr"}">${x.pub?"Nashr":"Qoralama"}</span></td><td><button class="btn g s" data-a="edit" data-i="${x.id}">Tahrirlash</button> <button class="btn g s" data-a="del" data-i="${x.id}">${st.del===x.id?"Ishonchingiz komilmi?":"O'chirish"}</button></td></tr>`).join(""):`<tr><td colspan="8" style="text-align:center;color:var(--mut);padding:32px">Hech narsa topilmadi. Yangi hikoya qo'shing.</td></tr>`}</table></div>`;
+}
+function users(){
+ return `<h1>Foydalanuvchilar</h1><p class="sub">Premium'ni qo'lda berish (to'lov ulanmaguncha)</p>
+ <div class="tw" style="margin-top:18px"><table><tr><th>Ism</th><th>Telegram ID</th><th>Holat</th><th>Premium muddati</th><th></th></tr>
+ ${db.u.map(u=>`<tr><td>${esc(u.n)}</td><td>${u.id}</td><td><span class="bd ${isP(u)?"p":""}">${isP(u)?"Premium":"Bepul"}</span></td><td>${u.pu?dt(u.pu):"–"}</td><td><button class="btn g s" data-a="prem" data-id="${u.id}">${isP(u)?"Bekor qilish":"Premium berish (30 kun)"}</button></td></tr>`).join("")}</table></div>
+ <p class="note">Ro'yxatdagi foydalanuvchilar va ID'lar namuna. Haqiqiy foydalanuvchilar botga kirganda backend orqali qo'shiladi.</p>`;
+}
+function modal(){
+ const n=st.edit==="new",x=n?{t:"",ty:"a",c:CATS[0],age:AGES[1],d:0,pr:0,pub:0,x:"",fn:""}:db.s.find(s=>s.id===st.edit);
+ const sel=(a,v)=>a.map(o=>`<option ${o===v?"selected":""}>${o}</option>`).join("");
+ return `<div class="mo" id="mo"><div class="md" role="dialog" aria-label="Hikoya"><h2>${n?"Yangi hikoya":"Hikoyani tahrirlash"}</h2>
+ <div class="f"><label for="f_t">Sarlavha</label><input id="f_t" value="${esc(x.t)}"></div>
+ <div class="two"><div class="f"><label for="f_ty">Turi</label><select id="f_ty"><option value="a" ${x.ty==="a"?"selected":""}>Audio</option><option value="v" ${x.ty==="v"?"selected":""}>Video</option></select></div><div class="f"><label for="f_c">Turkum</label><select id="f_c">${sel(CATS,x.c)}</select></div></div>
+ <div class="two"><div class="f"><label for="f_a">Yosh toifasi</label><select id="f_a">${sel(AGES,x.age)}</select></div><div class="f"><label for="f_d">Davomiyligi (daqiqa)</label><input id="f_d" type="number" min="0" step="0.1" value="${x.d?Math.round(x.d/6)/10:""}"></div></div>
+ <div class="f"><label for="f_f">Fayl (audio yoki video)</label><input id="f_f" type="file" accept="audio/*,video/*"><span class="sub" id="fn">${x.fn?esc(x.fn):"Fayl tanlanmagan"}</span></div>
+ <div class="f"><label for="f_x">Qisqa tavsif</label><textarea id="f_x" rows="3">${esc(x.x)}</textarea></div>
+ <div class="two"><div class="f"><label for="f_p">Kirish</label><select id="f_p"><option value="0" ${x.pr?"":"selected"}>Bepul</option><option value="1" ${x.pr?"selected":""}>Premium</option></select></div><div class="f"><label for="f_s">Holat</label><select id="f_s"><option value="0" ${x.pub?"":"selected"}>Qoralama</option><option value="1" ${x.pub?"selected":""}>Nashr</option></select></div></div>
+ <p class="note" style="margin-top:0">Namuna rejim: fayl serverga yuklanmaydi, faqat nomi va davomiyligi saqlanadi.</p>
+ <div class="ft"><button class="btn g" data-a="cancel">Bekor qilish</button><button class="btn" data-a="save">Saqlash</button></div></div></div>`;
+}
+function render(){
+ if(!st.ok){$("#app").innerHTML=`<div class="login"><div class="md">${LOGO}<h2>Admin paneli</h2><p class="sub" style="margin:6px 0 18px;line-height:1.5">Namuna rejim. Haqiqiy kirish Telegram ID orqali backendda tekshiriladi va faqat admin ID'siga ruxsat beriladi.</p><button class="btn" data-a="login" style="width:100%">Kirish (namuna)</button></div></div>`;return}
+ const nav=[["dash","Boshqaruv"],["stories","Hikoyalar"],["users","Foydalanuvchilar"]].map(([k,l])=>`<button class="${st.pg===k?"on":""}" data-a="pg" data-k="${k}">${l}</button>`).join("");
+ $("#app").innerHTML=`<div class="wrap"><nav class="side">${LOGO}${nav}<span class="sp"></span><button data-a="out">Chiqish</button></nav><main>${st.pg==="dash"?dash():st.pg==="stories"?stories():users()}</main></div>${st.edit!==null?modal():""}`;
+ const q=$("#q");if(q){q.oninput=e=>{st.q=e.target.value;const p=e.target.selectionStart;render();const n=$("#q");n.focus();n.setSelectionRange(p,p)};$("#ty").onchange=e=>{st.ty=e.target.value;render()}}
+ const f=$("#f_f");if(f)f.onchange=e=>{const fl=e.target.files[0];if(!fl)return;$("#fn").textContent=fl.name;$("#f_ty").value=fl.type.startsWith("video")?"v":"a";const u=URL.createObjectURL(fl),m=document.createElement(fl.type.startsWith("video")?"video":"audio");m.preload="metadata";m.onloadedmetadata=()=>{if(isFinite(m.duration))$("#f_d").value=Math.round(m.duration/6)/10;URL.revokeObjectURL(u)};m.src=u;st.fname=fl.name}
+}
+document.addEventListener("click",e=>{
+ const b=e.target.closest("[data-a]");if(!b){if(e.target.id==="mo"){st.edit=null;render()}return}
+ const a=b.dataset.a,i=+b.dataset.i;
+ if(a==="login"){st.ok=true;render()}
+ else if(a==="out"){st.ok=false;render()}
+ else if(a==="pg"){st.pg=b.dataset.k;st.del=null;render()}
+ else if(a==="new"){st.edit="new";st.fname="";render()}
+ else if(a==="edit"){st.edit=i;st.fname="";render()}
+ else if(a==="cancel"){st.edit=null;render()}
+ else if(a==="del"){if(st.del===i){db.s=db.s.filter(s=>s.id!==i);st.del=null;sv();toast("O'chirildi")}else st.del=i;render()}
+ else if(a==="prem"){const u=db.u.find(u=>u.id===+b.dataset.id);u.pu=isP(u)?0:Date.now()+30*D;sv();toast(isP(u)?"Premium berildi":"Premium bekor qilindi");render()}
+ else if(a==="save"){
+  const t=$("#f_t").value.trim();if(!t){toast("Sarlavhani kiriting");$("#f_t").focus();return}
+  const o={t,ty:$("#f_ty").value,c:$("#f_c").value,age:$("#f_a").value,d:Math.round((+$("#f_d").value||0)*60),pr:+$("#f_p").value,pub:+$("#f_s").value,x:$("#f_x").value.trim()};
+  if(st.edit==="new"){db.s.unshift({id:db.nid++,v:0,fn:st.fname||"",...o})}
+  else{const s=db.s.find(s=>s.id===st.edit);Object.assign(s,o);if(st.fname)s.fn=st.fname}
+  st.edit=null;st.pg="stories";sv();toast("Saqlandi");render()}
+});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&st.edit!==null){st.edit=null;render()}});
+render();
+</script></body></html>
